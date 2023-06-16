@@ -11,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM  gcr.io/spectro-images-public/golang:1.19-alpine as builder
+FROM alpine:3.17.0 as builder
 
 COPY . /
 
 RUN apk update \
   && apk upgrade \
   && apk add -U bash \
+  && apk add -U go \
   && /build.sh
 
 # Use a multi-stage build
