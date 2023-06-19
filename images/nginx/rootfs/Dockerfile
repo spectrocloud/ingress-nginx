@@ -18,6 +18,7 @@ COPY . /
 RUN apk update \
   && apk upgrade \
   && apk add -U bash \
+  && apk add -U go \
   && /build.sh
 
 # Use a multi-stage build

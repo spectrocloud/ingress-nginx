@@ -41,7 +41,8 @@ for var in "${mandatory[@]}"; do
   fi
 done
 
-export CGO_ENABLED=0
+export CGO_ENABLED=1
+export GOEXPERIMENT=boringcrypto
 export GOARCH=${ARCH}
 
 TARGETS_DIR="rootfs/bin/${ARCH}"
@@ -50,7 +51,7 @@ echo "Building targets for ${ARCH}, generated targets in ${TARGETS_DIR} director
 echo "Building ${PKG}/cmd/nginx"
 
 ${GO_BUILD_CMD} \
-  -trimpath -ldflags="-buildid= -w -s \
+  -trimpath -ldflags="-linkmode=external -extldflags=-static -buildid= -w -s \
   -X ${PKG}/version.RELEASE=${TAG} \
   -X ${PKG}/version.COMMIT=${COMMIT_SHA} \
   -X ${PKG}/version.REPO=${REPO_INFO}" \
@@ -60,7 +61,7 @@ ${GO_BUILD_CMD} \
 echo "Building ${PKG}/cmd/dbg"
 
 ${GO_BUILD_CMD} \
-  -trimpath -ldflags="-buildid= -w -s \
+  -trimpath -ldflags="-linkmode=external -extldflags=-static -buildid= -w -s \
   -X ${PKG}/version.RELEASE=${TAG} \
   -X ${PKG}/version.COMMIT=${COMMIT_SHA} \
   -X ${PKG}/version.REPO=${REPO_INFO}" \
@@ -70,7 +71,7 @@ ${GO_BUILD_CMD} \
 echo "Building ${PKG}/cmd/waitshutdown"
 
 ${GO_BUILD_CMD} \
-  -trimpath -ldflags="-buildid= -w -s \
+  -trimpath -ldflags="-linkmode=external -extldflags=-static -buildid= -w -s \
   -X ${PKG}/version.RELEASE=${TAG} \
   -X ${PKG}/version.COMMIT=${COMMIT_SHA} \
   -X ${PKG}/version.REPO=${REPO_INFO}" \

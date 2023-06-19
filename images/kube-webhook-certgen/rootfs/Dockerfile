@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM --platform=$BUILDPLATFORM golang:1.19.4 as builder
+FROM --platform=$BUILDPLATFORM gcr.io/spectro-images-public/golang:1.19-alpine as builder
 ARG BUILDPLATFORM
 ARG TARGETARCH
 
 WORKDIR /workspace
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -a -o kube-webhook-certgen main.go
+RUN CGO_ENABLED=1 GOEXPERIMENT=boringcrypto GOOS=linux GOARCH=${TARGETARCH} go build -ldflags "-linkmode=external -extldflags=-static" -a -o kube-webhook-certgen main.go
 
 FROM --platform=$BUILDPLATFORM gcr.io/distroless/static:nonroot
 ARG BUILDPLATFORM
