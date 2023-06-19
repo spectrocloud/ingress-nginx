@@ -20,8 +20,8 @@ WORKDIR /go/src/k8s.io/ingress-nginx/images/custom-error-pages
 COPY . .
 
 RUN go get . && \
-    CGO_ENABLED=0 go build -a -installsuffix cgo \
-	-ldflags "-s -w" \
+    CGO_ENABLED=1 go build -a -installsuffix cgo \
+	-ldflags "-linkmode=external -extldflags=-static -s -w" \
 	-o nginx-errors .
 
 # Use distroless as minimal base image to package the binary
