@@ -338,7 +338,7 @@ export HUNTER_JOBS_NUMBER=${CORES}
 export HUNTER_USE_CACHE_SERVERS=true
 
 # Build BoringSSL
-git clone https://boringssl.googlesource.com/boringssl
+git clone https://boringssl.googlesource.com/boringssl --depth=1 -b fips-20220613
 cd boringssl
 mkdir build
 cd $BUILD_PATH/boringssl/build
