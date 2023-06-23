@@ -233,6 +233,7 @@ BUILDX_PLATFORMS ?= linux/amd64,linux/arm,linux/arm64,linux/s390x
 .PHONY: release # Build a multi-arch docker image
 release: ensure-buildx clean
 	echo "Building binaries..."
+	echo "Building binaries...BASE_IMAGE: $(BASE_IMAGE)"
 	$(foreach PLATFORM,$(PLATFORMS), echo -n "$(PLATFORM)..."; ARCH=$(PLATFORM) make build;)
 
 	echo "Building and pushing ingress-nginx image...$(BUILDX_PLATFORMS)"
@@ -240,7 +241,6 @@ release: ensure-buildx clean
 	docker buildx build \
 		--no-cache \
 		$(MAC_DOCKER_FLAGS) \
-		--push \
 		--pull \
 		--progress plain \
 		--platform $(BUILDX_PLATFORMS) \
@@ -253,7 +253,6 @@ release: ensure-buildx clean
 	docker buildx build \
 		--no-cache \
 		$(MAC_DOCKER_FLAGS) \
-		--push \
 		--pull \
 		--progress plain \
 		--platform $(BUILDX_PLATFORMS)  \

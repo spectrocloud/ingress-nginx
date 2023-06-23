@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.20.1-alpine3.17 as builder
+FROM gcr.io/spectro-images-public/golang:1.19-alpine as builder
 
 RUN apk update \
     && apk upgrade && apk add git
@@ -22,8 +22,8 @@ WORKDIR /go/src/k8s.io/ingress-nginx/images/custom-error-pages
 COPY . .
 
 RUN go get . && \
-    CGO_ENABLED=0 go build -a -installsuffix cgo \
-	-ldflags "-s -w" \
+    CGO_ENABLED=1 GOEXPERIMENT=boringcrypto go build -a -installsuffix cgo \
+	-ldflags "-linkmode=external -extldflags=-static -s -w" \
 	-o nginx-errors .
 
 # Use distroless as minimal base image to package the binary

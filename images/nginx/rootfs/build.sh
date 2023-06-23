@@ -332,6 +332,24 @@ export CTEST_BUILD_FLAGS=${MAKEFLAGS}
 export HUNTER_JOBS_NUMBER=${CORES}
 export HUNTER_USE_CACHE_SERVERS=true
 
+# Build BoringSSL
+git clone https://boringssl.googlesource.com/boringssl --depth=1 -b fips-20220613
+cd boringssl
+mkdir build
+cd $BUILD_PATH/boringssl/build
+cmake ..
+make
+
+# Make an .openssl directory for nginx and then symlink BoringSSL's include directory tree
+mkdir -p "$BUILD_PATH/boringssl/.openssl/lib"
+cd "$BUILD_PATH/boringssl/.openssl"
+ln -s ../include include
+
+# Copy the BoringSSL crypto libraries to .openssl/lib so nginx can find them
+cd "$BUILD_PATH/boringssl"
+cp "build/crypto/libcrypto.a" ".openssl/lib"
+cp "build/ssl/libssl.a" ".openssl/lib"
+
 # Install luajit from openresty fork
 export LUAJIT_LIB=/usr/local/lib
 export LUA_LIB_DIR="$LUAJIT_LIB/lua"
@@ -582,6 +600,7 @@ for PATCH in `ls /patches`;do
 done
 
 WITH_FLAGS="--with-debug \
+  --with-openssl="$BUILD_PATH/boringssl" \
   --with-compat \
   --with-pcre-jit \
   --with-http_ssl_module \
@@ -613,6 +632,7 @@ CC_OPT="-g -O2 -fPIE -fstack-protector-strong \
   -DTCP_FASTOPEN=23 \
   -fPIC \
   -I$HUNTER_INSTALL_DIR/include \
+  -I$BUILD_PATH/boringssl/.openssl/include \
   -Wno-cast-function-type"
 
 LD_OPT="-fPIE -fPIC -pie -Wl,-z,relro -Wl,-z,now -L$HUNTER_INSTALL_DIR/lib"
@@ -624,6 +644,9 @@ fi
 if [[ ${ARCH} == "x86_64" ]]; then
   CC_OPT+=' -m64 -mtune=generic'
 fi
+
+# Fix "Error 127" during build
+touch "$BUILD_PATH/boringssl/.openssl/include/openssl/ssl.h"
 
 WITH_MODULES=" \
   --add-module=$BUILD_PATH/ngx_devel_kit-$NDK_VERSION \
