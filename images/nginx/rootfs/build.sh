@@ -355,23 +355,6 @@ cd "$BUILD_PATH/boringssl"
 cp "build/crypto/libcrypto.a" ".openssl/lib"
 cp "build/ssl/libssl.a" ".openssl/lib"
 
-# Install libmaxminddb
-git clone --recursive https://github.com/maxmind/libmaxminddb --depth=1 -b 1.7.1
-cd libmaxminddb
-./bootstrap
-./configure
-make
-make install
-cd "$BUILD_PATH"
-
-# Install zlib
-git clone --recursive https://github.com/madler/zlib.git --depth=1 -b v1.2.13
-cd zlib
-./configure
-make
-make install
-cd "$BUILD_PATH"
-
 # Install luajit from openresty fork
 export LUAJIT_LIB=/usr/local/lib
 export LUA_LIB_DIR="$LUAJIT_LIB/lua"
@@ -644,7 +627,7 @@ WITH_FLAGS="--with-debug \
 
 # "Combining -flto with -g is currently experimental and expected to produce unexpected results."
 # https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
-CC_OPT="-static -g -O2 -fPIE -fstack-protector-strong \
+CC_OPT="-g -O2 -fPIE -fstack-protector-strong \
   -Wformat \
   -Werror=format-security \
   -Wno-deprecated-declarations \
@@ -652,11 +635,12 @@ CC_OPT="-static -g -O2 -fPIE -fstack-protector-strong \
   -D_FORTIFY_SOURCE=2 \
   --param=ssp-buffer-size=4 \
   -DTCP_FASTOPEN=23 \
+  -fPIC \
   -I$HUNTER_INSTALL_DIR/include \
   -I$BUILD_PATH/boringssl/.openssl/include \
   -Wno-cast-function-type"
 
-LD_OPT="-static -static-libgcc -static-libstdc++ -fPIE -pie -Wl,-z,relro -Wl,-z,now -L$HUNTER_INSTALL_DIR/lib -L$BUILD_PATH/boringssl/.openssl/lib"
+LD_OPT="-fPIE -fPIC -pie -Wl,-z,relro -Wl,-z,now -L$HUNTER_INSTALL_DIR/lib -L$BUILD_PATH/boringssl/.openssl/lib"
 
 if [[ ${ARCH} != "aarch64" ]]; then
   WITH_FLAGS+=" --with-file-aio"
@@ -665,6 +649,9 @@ fi
 if [[ ${ARCH} == "x86_64" ]]; then
   CC_OPT+=' -m64 -mtune=generic'
 fi
+
+# change to use c++14
+sed -i "s/c++11/c++14/" $BUILD_PATH/nginx-opentracing-$NGINX_OPENTRACING_VERSION/opentracing/config.make
 
 WITH_MODULES=" \
   --add-module=$BUILD_PATH/ngx_devel_kit-$NDK_VERSION \
@@ -675,18 +662,12 @@ WITH_MODULES=" \
   --add-module=$BUILD_PATH/stream-lua-nginx-module-$LUA_STREAM_NGX_VERSION \
   --add-module=$BUILD_PATH/lua-upstream-nginx-module-$LUA_UPSTREAM_VERSION \
   --add-module=$BUILD_PATH/nginx_ajp_module-${NGINX_AJP_VERSION} \
-  --add-module=$BUILD_PATH/nginx-http-auth-digest-$NGINX_DIGEST_AUTH \
-  --add-module=$BUILD_PATH/nginx-influxdb-module-$NGINX_INFLUXDB_VERSION \
-  --add-module=$BUILD_PATH/ngx_http_geoip2_module-${GEOIP2_VERSION} \
-  --add-module=$BUILD_PATH/ngx_brotli"
-
-# removed nginx-opentracing and ModSecurity-nginx; changed rest to static modules
-#  --add-dynamic-module=$BUILD_PATH/nginx-http-auth-digest-$NGINX_DIGEST_AUTH \
-#  --add-dynamic-module=$BUILD_PATH/nginx-influxdb-module-$NGINX_INFLUXDB_VERSION \
-#  --add-dynamic-module=$BUILD_PATH/nginx-opentracing-$NGINX_OPENTRACING_VERSION/opentracing \
-#  --add-dynamic-module=$BUILD_PATH/ModSecurity-nginx-$MODSECURITY_VERSION \
-#  --add-dynamic-module=$BUILD_PATH/ngx_http_geoip2_module-${GEOIP2_VERSION} \
-#  --add-dynamic-module=$BUILD_PATH/ngx_brotli"
+  --add-dynamic-module=$BUILD_PATH/nginx-http-auth-digest-$NGINX_DIGEST_AUTH \
+  --add-dynamic-module=$BUILD_PATH/nginx-influxdb-module-$NGINX_INFLUXDB_VERSION \
+  --add-dynamic-module=$BUILD_PATH/nginx-opentracing-$NGINX_OPENTRACING_VERSION/opentracing \
+  --add-dynamic-module=$BUILD_PATH/ModSecurity-nginx-$MODSECURITY_VERSION \
+  --add-dynamic-module=$BUILD_PATH/ngx_http_geoip2_module-${GEOIP2_VERSION} \
+  --add-dynamic-module=$BUILD_PATH/ngx_brotli"
 
 ./configure \
   --prefix=/usr/local/nginx \
