@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM alpine:3.17.0 as builder
+FROM alpine:3.15.0 as builder
 
 COPY . /
 
 RUN apk update \
   && apk upgrade \
   && apk add -U bash --no-cache \
-  && apk add -U go=1.19.9-r0 --no-cache \
+  && apk add -U go --no-cache \
   && /build.sh
 
 # Use a multi-stage build

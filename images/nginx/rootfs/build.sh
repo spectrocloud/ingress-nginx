@@ -333,8 +333,9 @@ export HUNTER_JOBS_NUMBER=${CORES}
 export HUNTER_USE_CACHE_SERVERS=true
 
 # Build BoringSSL
-git clone https://boringssl.googlesource.com/boringssl --depth=1 -b fips-20220613
+git clone https://boringssl.googlesource.com/boringssl
 cd boringssl
+git checkout ae223d6138807a13006342edfeef32e813246b39
 mkdir build
 cd $BUILD_PATH/boringssl/build
 cmake ..
@@ -635,7 +636,7 @@ CC_OPT="-g -O2 -fPIE -fstack-protector-strong \
   -I$BUILD_PATH/boringssl/.openssl/include \
   -Wno-cast-function-type"
 
-LD_OPT="-fPIE -fPIC -pie -Wl,-z,relro -Wl,-z,now -L$HUNTER_INSTALL_DIR/lib"
+LD_OPT="-fPIE -fPIC -pie -Wl,-z,relro -Wl,-z,now -L$HUNTER_INSTALL_DIR/lib -L$BUILD_PATH/boringssl/.openssl/lib"
 
 if [[ ${ARCH} != "aarch64" ]]; then
   WITH_FLAGS+=" --with-file-aio"
@@ -645,8 +646,8 @@ if [[ ${ARCH} == "x86_64" ]]; then
   CC_OPT+=' -m64 -mtune=generic'
 fi
 
-# Fix "Error 127" during build
-touch "$BUILD_PATH/boringssl/.openssl/include/openssl/ssl.h"
+# change to use c++14
+sed -i "s/c++11/c++14/" $BUILD_PATH/nginx-opentracing-$NGINX_OPENTRACING_VERSION/opentracing/config.make
 
 WITH_MODULES=" \
   --add-module=$BUILD_PATH/ngx_devel_kit-$NDK_VERSION \
@@ -687,6 +688,9 @@ WITH_MODULES=" \
   --user=www-data \
   --group=www-data \
   ${WITH_MODULES}
+
+# Fix "Error 127" during build
+touch "$BUILD_PATH/boringssl/.openssl/include/openssl/ssl.h"
 
 make
 make modules
