@@ -117,6 +117,10 @@ RUN mkdir -p /chroot/modules_mount \
   && mkdir -p modules_mount \
   && ln -s /modules_mount /chroot/modules_mount
 
+# Clean up
+RUN apk del bash curl libcurl diffutils libmaxminddb patch ca-certificates busybox alpine-baselayout \
+  ssl_client libcrypto3 libssl3 openssl alpine-keys apk-tools
+
 USER www-data
 
 EXPOSE 80 443
