@@ -18,7 +18,7 @@ ARG TARGETARCH
 
 WORKDIR /workspace
 COPY . .
-RUN CGO_ENABLED=1 GOEXPERIMENT=boringcrypto GOOS=linux GOARCH=${TARGETARCH} go build -a -o kube-webhook-certgen main.go
+RUN CGO_ENABLED=1 GOEXPERIMENT=boringcrypto GOOS=linux GOARCH=${TARGETARCH} go build -ldflags="-linkmode=external -extldflags=-static" -a -o kube-webhook-certgen main.go
 
 FROM --platform=$BUILDPLATFORM gcr.io/distroless/static:nonroot
 ARG BUILDPLATFORM
