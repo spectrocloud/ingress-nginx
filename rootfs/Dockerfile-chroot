@@ -50,13 +50,13 @@ RUN apk update \
   && apk add -U --no-cache \
      bash \
      openssl \
-     curl \
      ca-certificates \
      dumb-init \
      tzdata \
      diffutils \
      util-linux \
   && ln -s /usr/local/nginx/sbin/nginx /sbin/nginx \
+  && ln -s /usr/local/nginx/sbin/nginx /nginx \ 
   && adduser -S -D -H -u 101 -h /usr/local/nginx \
     -s /sbin/nologin -G www-data -g www-data www-data 
 
@@ -118,8 +118,8 @@ RUN mkdir -p /chroot/modules_mount \
   && ln -s /modules_mount /chroot/modules_mount
 
 # Clean up
-RUN apk del bash curl libcurl diffutils libmaxminddb patch ca-certificates busybox alpine-baselayout \
-  ssl_client libcrypto3 libssl3 openssl alpine-keys apk-tools
+RUN apk del --purge bash util-linux diffutils patch ca-certificates busybox alpine-baselayout \
+  libmaxminddb ssl_client libcrypto3 libssl3 openssl alpine-keys apk-tools
 
 USER www-data
 

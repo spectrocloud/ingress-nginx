@@ -11,14 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM alpine:3.15.0 as builder
+FROM alpine:3.15.0 as boringssl-builder
 
-COPY . /
+COPY ./build-boringssl.sh /build-boringssl.sh
 
 RUN apk update \
   && apk upgrade \
   && apk add -U bash --no-cache \
   && apk add -U go --no-cache \
+  && /build-boringssl.sh
+
+FROM alpine:3.17.0 as builder
+
+COPY . /
+
+COPY --from=boringssl-builder /boringssl /boringssl
+
+RUN apk update \
+  && apk upgrade \
+  && apk add -U bash --no-cache \
   && /build.sh
 
 # Use a multi-stage build
@@ -37,11 +48,9 @@ RUN apk update \
   && apk upgrade \
   && apk add -U --no-cache \
   bash \
-  openssl \
   pcre \
   zlib \
   geoip \
-  curl \
   ca-certificates \
   patch \
   yajl \
