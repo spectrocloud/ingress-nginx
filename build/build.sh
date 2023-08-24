@@ -41,9 +41,19 @@ for var in "${mandatory[@]}"; do
   fi
 done
 
-export CGO_ENABLED=1
-export GOEXPERIMENT=boringcrypto
+FIPS_ENABLED=${FIPS_ENABLED:-}
+EXTRA_LD_FLAGS=""
+
+if [[ "$FIPS_ENABLED" == "1" ]]; then
+  export CGO_ENABLED=1
+  export GOEXPERIMENT=boringcrypto
+  EXTRA_LD_FLAGS="-linkmode=external -extldflags=-static"
+else
+  export CGO_ENABLED=0
+  unset GOEXPERIMENT
+fi
 export GOARCH=${ARCH}
+
 
 TARGETS_DIR="rootfs/bin/${ARCH}"
 echo "Building targets for ${ARCH}, generated targets in ${TARGETS_DIR} directory."
@@ -51,7 +61,7 @@ echo "Building targets for ${ARCH}, generated targets in ${TARGETS_DIR} director
 echo "Building ${PKG}/cmd/nginx"
 
 ${GO_BUILD_CMD} \
-  -trimpath -ldflags="-linkmode=external -extldflags=-static -buildid= -w -s \
+  -trimpath -ldflags="${EXTRA_LD_FLAGS} -buildid= -w -s \
   -X ${PKG}/version.RELEASE=${TAG} \
   -X ${PKG}/version.COMMIT=${COMMIT_SHA} \
   -X ${PKG}/version.REPO=${REPO_INFO}" \
