@@ -41,6 +41,12 @@ build: ensure-buildx
 		--pull \
 		-t $(IMAGE):$(TAG) rootfs
 
+	docker buildx build \
+		--platform=${PLATFORMS} $(OUTPUT) \
+		--progress=$(PROGRESS) \
+		--pull \
+		-t $(IMAGE):$(TAG)-fips rootfs -f rootfs/Dockerfile.fips
+
 # push the cross built image
 push: OUTPUT=--push
 push: build
