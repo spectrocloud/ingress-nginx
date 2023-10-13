@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM --platform=$BUILDPLATFORM gcr.io/spectro-images-public/golang:1.19-alpine as builder
+FROM --platform=$BUILDPLATFORM gcr.io/spectro-images-public/golang:1.21-alpine as builder
 ARG BUILDPLATFORM
 ARG TARGETARCH
 

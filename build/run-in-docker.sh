@@ -101,7 +101,7 @@ else
   fi
 
   # use spectrocloud golang builder image
-  E2E_IMAGE="gcr.io/spectro-images-public/golang:1.19-alpine"
+  E2E_IMAGE="gcr.io/spectro-images-public/golang:1.21-alpine"
 
   ${RUNTIME} run $args ${E2E_IMAGE} /bin/bash -c "${FLAGS}"
 fi

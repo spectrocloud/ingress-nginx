@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM gcr.io/spectro-images-public/golang:1.19-alpine as builder
+FROM gcr.io/spectro-images-public/golang:1.21-alpine as builder
 
 RUN apk update \
     && apk upgrade && apk add git
