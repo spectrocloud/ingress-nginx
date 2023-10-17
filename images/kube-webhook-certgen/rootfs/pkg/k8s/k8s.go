@@ -221,7 +221,7 @@ func (k8s *k8s) patchMutating(ctx context.Context, configurationName string, ca 
 
 // GetCaFromSecret will check for the presence of a secret. If it exists, will return the content of the
 // "ca" from the secret, otherwise will return nil
-func (k8s *k8s) GetCaFromSecret(ctx context.Context, secretName string, namespace string) []byte {
+func (k8s *k8s) GetCaFromSecret(ctx context.Context, secretName string, namespace string, caName string) []byte {
 	log.Debugf("getting secret '%s' in namespace '%s'", secretName, namespace)
 	secret, err := k8s.clientset.CoreV1().Secrets(namespace).Get(ctx, secretName, metav1.GetOptions{})
 	if err != nil {
@@ -232,22 +232,22 @@ func (k8s *k8s) GetCaFromSecret(ctx context.Context, secretName string, namespac
 		log.WithField("err", err).Fatal("error getting secret")
 	}
 
-	data := secret.Data["ca"]
+	data := secret.Data[caName]
 	if data == nil {
-		log.Fatal("got secret, but it did not contain a 'ca' key")
+		log.Fatalf("got secret, but it did not contain a '%s' key\n", caName)
 	}
 	log.Debug("got secret")
 	return data
 }
 
 // SaveCertsToSecret saves the provided ca, cert and key into a secret in the specified namespace.
-func (k8s *k8s) SaveCertsToSecret(ctx context.Context, secretName, namespace, certName, keyName string, ca, cert, key []byte) {
+func (k8s *k8s) SaveCertsToSecret(ctx context.Context, secretName, namespace, caName, certName, keyName string, ca, cert, key []byte) {
 	log.Debugf("saving to secret '%s' in namespace '%s'", secretName, namespace)
 	secret := &v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: secretName,
 		},
-		Data: map[string][]byte{"ca": ca, certName: cert, keyName: key},
+		Data: map[string][]byte{caName: ca, certName: cert, keyName: key},
 	}
 
 	log.Debug("saving secret")

@@ -28,13 +28,14 @@ type PatchConfig struct {
 
 	SecretName string
 	Namespace  string
+	CaName     string
 
 	Patcher Patcher
 }
 
 type Patcher interface {
 	PatchObjects(ctx context.Context, options k8s.PatchOptions) error
-	GetCaFromSecret(ctx context.Context, secretName, namespace string) []byte
+	GetCaFromSecret(ctx context.Context, secretName, namespace, caName string) []byte
 }
 
 func Patch(ctx context.Context, cfg *PatchConfig) error {
@@ -59,10 +60,10 @@ func Patch(ctx context.Context, cfg *PatchConfig) error {
 		return fmt.Errorf("patch-failure-policy %s is not valid", cfg.PatchFailurePolicy)
 	}
 
-	ca := cfg.Patcher.GetCaFromSecret(ctx, cfg.SecretName, cfg.Namespace)
+	ca := cfg.Patcher.GetCaFromSecret(ctx, cfg.SecretName, cfg.Namespace, cfg.CaName)
 
 	if ca == nil {
-		return fmt.Errorf("no secret with '%s' in '%s'", cfg.SecretName, cfg.Namespace)
+		return fmt.Errorf("no secret with '%s' in '%s' having ca key %s", cfg.SecretName, cfg.Namespace, cfg.CaName)
 	}
 
 	options := k8s.PatchOptions{
@@ -88,6 +89,7 @@ func patchCommand(_ *cobra.Command, _ []string) {
 	config := &PatchConfig{
 		SecretName:         cfg.secretName,
 		Namespace:          cfg.namespace,
+		CaName:             cfg.caName,
 		PatchMutating:      cfg.patchMutating,
 		PatchValidating:    cfg.patchValidating,
 		PatchFailurePolicy: cfg.patchFailurePolicy,
@@ -111,6 +113,7 @@ func init() {
 	rootCmd.AddCommand(patch)
 	patch.Flags().StringVar(&cfg.secretName, "secret-name", "", "Name of the secret where certificate information will be read from")
 	patch.Flags().StringVar(&cfg.namespace, "namespace", "", "Namespace of the secret where certificate information will be read from")
+	patch.Flags().StringVar(&cfg.caName, "ca-name", "ca", "Name of the ca cert file in the secret")
 	patch.Flags().StringVar(&cfg.webhookName, "webhook-name", "", "Name of ValidatingWebhookConfiguration and MutatingWebhookConfiguration that will be updated")
 	patch.Flags().StringVar(&cfg.apiServiceName, "apiservice-name", "", "Name of APIService that will be patched")
 	patch.Flags().BoolVar(&cfg.patchValidating, "patch-validating", true, "If true, patch ValidatingWebhookConfiguration")

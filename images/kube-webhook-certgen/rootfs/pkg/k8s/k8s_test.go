@@ -58,7 +58,7 @@ func TestGetCaFromCertificate(t *testing.T) {
 
 	k := newTestSimpleK8s(secret)
 
-	retrievedCa := k.GetCaFromSecret(contextWithDeadline(t), testSecretName, testNamespace)
+	retrievedCa := k.GetCaFromSecret(contextWithDeadline(t), testSecretName, testNamespace, "ca")
 	if !bytes.Equal(retrievedCa, ca) {
 		t.Error("Was not able to retrieve CA information that was saved")
 	}
@@ -71,7 +71,7 @@ func TestSaveCertsToSecret(t *testing.T) {
 
 	ctx := contextWithDeadline(t)
 
-	k.SaveCertsToSecret(ctx, testSecretName, testNamespace, "cert", "key", ca, cert, key)
+	k.SaveCertsToSecret(ctx, testSecretName, testNamespace, "ca", "cert", "key", ca, cert, key)
 
 	secret, _ := k.clientset.CoreV1().Secrets(testNamespace).Get(ctx, testSecretName, metav1.GetOptions{})
 
@@ -88,8 +88,8 @@ func TestSaveThenLoadSecret(t *testing.T) {
 	k := newTestSimpleK8s()
 	ca, cert, key := genSecretData()
 	ctx := contextWithDeadline(t)
-	k.SaveCertsToSecret(ctx, testSecretName, testNamespace, "cert", "key", ca, cert, key)
-	retrievedCert := k.GetCaFromSecret(ctx, testSecretName, testNamespace)
+	k.SaveCertsToSecret(ctx, testSecretName, testNamespace, "ca", "cert", "key", ca, cert, key)
+	retrievedCert := k.GetCaFromSecret(ctx, testSecretName, testNamespace, "ca")
 	if !bytes.Equal(retrievedCert, ca) {
 		t.Error("Was not able to retrieve CA information that was saved")
 	}
