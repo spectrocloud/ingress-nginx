@@ -1,6 +1,6 @@
 module k8s.io/ingress-nginx
 
-go 1.20
+go 1.21
 
 require (
 	github.com/armon/go-proxyproto v0.0.0-20210323213023-7e956b284f0a
@@ -25,7 +25,7 @@ require (
 	github.com/stretchr/testify v1.8.2
 	github.com/yudai/gojsondiff v1.0.0
 	github.com/zakjan/cert-chain-resolver v0.0.0-20211122211144-c6b0b792af9a
-	golang.org/x/crypto v0.8.0
+	golang.org/x/crypto v0.14.0
 	google.golang.org/grpc v1.54.0
 	google.golang.org/grpc/examples v0.0.0-20221220003428-4f16fbe410f7
 	gopkg.in/go-playground/pool.v3 v3.1.1
@@ -50,10 +50,10 @@ require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
-	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
+	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
+	github.com/emicklei/go-restful/v3 v3.10.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/fullsailor/pkcs7 v0.0.0-20160414161337-2585af45975b // indirect
@@ -95,17 +95,17 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
-	golang.org/x/term v0.7.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/term v0.13.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
